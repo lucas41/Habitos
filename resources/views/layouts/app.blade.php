@@ -60,6 +60,14 @@
                 <a href="{{ route('habits.index') }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('habits.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">Hábitos</a>
                 <a href="{{ route('categories.index') }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('categories.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">Categorias</a>
                 <a href="{{ route('analytics.index') }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ request()->routeIs('analytics.*') ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">Análises</a>
+                
+                <!-- Logout -->
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all">
+                        Sair
+                    </button>
+                </form>
             </nav>
         </div>
     </header>
@@ -98,5 +106,6 @@
         <span class="dark:hidden">🌙</span>
         <span class="hidden dark:inline">☀️</span>
     </button>
+    @yield('scripts')
 </body>
 </html>

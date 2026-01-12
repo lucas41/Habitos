@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Habit;
 use App\Models\HabitLog;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 use App\Services\StreakService;
 use App\Services\GamificationService;
@@ -25,18 +26,27 @@ class DashboardController extends Controller
     {
         $date = $request->input('date', date('Y-m-d'));
         
-        $habits = Habit::with(['category', 'logs' => function($q) use ($date) {
+        $habits = Habit::where('user_id', Auth::id())->with(['category', 'logs' => function($q) use ($date) {
             $q->where('date', $date);
         }])->get();
 
         $streak = $this->streakService->getStreak();
         $gamification = $this->gamificationService->getStats();
 
-        return view('dashboard', compact('habits', 'date', 'streak', 'gamification'));
+        // Calculate Daily Completion
+        $totalHabits = $habits->count();
+        $completedToday = $habits->filter(fn($h) => $h->logs->where('completed', true)->isNotEmpty())->count();
+        $dailyCompletion = $totalHabits > 0 ? round(($completedToday / $totalHabits) * 100) : 0;
+
+        return view('dashboard', compact('habits', 'date', 'streak', 'gamification', 'dailyCompletion'));
     }
 
     public function toggle(Request $request, Habit $habit)
     {
+        if ($habit->user_id !== Auth::id()) {
+            abort(403);
+        }
+
         $date = $request->input('date');
         
         $log = $habit->logs()->where('date', $date)->first();

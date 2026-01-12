@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Habit;
 use App\Models\HabitLog;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class StreakService
 {
@@ -40,7 +41,7 @@ class StreakService
         
         // Count habits that existed on that date
         // Note: This relies on created_at. If habits are deleted, they are gone from count (forgiving logic).
-        $totalHabits = Habit::whereDate('created_at', '<=', $formattedDate)->count();
+        $totalHabits = Habit::where('user_id', Auth::id())->whereDate('created_at', '<=', $formattedDate)->count();
         
         if ($totalHabits === 0) {
             return false;
@@ -48,7 +49,9 @@ class StreakService
 
         $completedLogs = HabitLog::where('date', $formattedDate)
             ->where('completed', true)
-            ->whereHas('habit') // Ensure habit still exists
+            ->whereHas('habit', function($q) {
+                $q->where('user_id', Auth::id());
+            }) // Ensure habit still exists and belongs to user
             ->count();
 
         return $completedLogs >= $totalHabits;

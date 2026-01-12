@@ -3,12 +3,16 @@
 namespace App\Services;
 
 use App\Models\GamificationStats;
+use Illuminate\Support\Facades\Auth;
 
 class GamificationService
 {
     public function getStats(): GamificationStats
     {
-        return GamificationStats::firstOrFail();
+        return GamificationStats::firstOrCreate(
+            ['user_id' => Auth::id()],
+            ['level' => 1, 'current_xp' => 0, 'next_level_xp' => 100]
+        );
     }
 
     public function addXp(int $amount)

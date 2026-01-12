@@ -6,6 +6,7 @@ use App\Models\Habit;
 use App\Models\HabitLog;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 use App\Services\StreakService;
 
@@ -20,13 +21,16 @@ class AnalyticsController extends Controller
 
     public function index()
     {
-        $habits = Habit::withCount(['logs' => function($q) {
+        $habits = Habit::where('user_id', Auth::id())->withCount(['logs' => function($q) {
             $q->where('completed', true);
         }])->get();
         
         $streak = $this->streakService->getStreak();
         
-        $logs = HabitLog::where('completed', true)->get();
+        $logs = HabitLog::where('completed', true)
+            ->whereHas('habit', function($q) {
+                $q->where('user_id', Auth::id());
+            })->get();
         $totalDone = $logs->count();
         
         $totalHabits = $habits->count();

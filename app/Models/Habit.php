@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Habit extends Model
 {
-    protected $fillable = ['name', 'category_id', 'icon', 'color'];
+    protected $fillable = ['name', 'category_id', 'icon', 'color', 'user_id'];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function category(): BelongsTo
     {
